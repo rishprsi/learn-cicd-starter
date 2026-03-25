@@ -9,9 +9,28 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
 
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
     steps:
       - name: Check out the code
         uses: actions/checkout@v4
+
+      - name: Install goose CLI
+        run: |
+          mkdir -p /home/runner/.local/bin
+          curl -fsSL https://github.com/block/goose/releases/download/stable/download_cli.sh \
+            | GOOSE_VERSION=REPLACE_WITH_VERSION CONFIGURE=false GOOSE_BIN_DIR=/home/runner/.local/bin bash
+          echo "/home/runner/.local/bin" >> $GITHUB_PATH
+
+      - name: Configure goose
+        run: |
+          mkdir -p ~/.config/goose
+          cat <<EOF > ~/.config/goose/config.yaml
+          GOOSE_PROVIDER: REPLACE_WITH_PROVIDER
+          GOOSE_MODEL: REPLACE_WITH_MODEL
+          keyring: false
+          EOF
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -20,6 +39,9 @@ jobs:
 
       - name: Build the app
         run: "./scripts/buildprod.sh"
+
+      - name: Perform migrations
+        run: "./scripts/migrateup.sh"
 
       - id: "auth"
         uses: "google-github-actions/auth@v2"
