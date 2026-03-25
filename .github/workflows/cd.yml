@@ -20,7 +20,7 @@ jobs:
         run: |
           mkdir -p /home/runner/.local/bin
           curl -fsSL https://github.com/block/goose/releases/download/stable/download_cli.sh \
-            | GOOSE_VERSION=REPLACE_WITH_VERSION CONFIGURE=false GOOSE_BIN_DIR=/home/runner/.local/bin bash
+            | GOOSE_VERSION=3.16.0 CONFIGURE=false GOOSE_BIN_DIR=/home/runner/.local/bin bash
           echo "/home/runner/.local/bin" >> $GITHUB_PATH
 
       - name: Configure goose
